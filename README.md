@@ -53,6 +53,7 @@ Radial mesh also can differ for the different frames.
 
 Versions of Astra: 
     6.2.1 - OK
+
     7.0   - OK ??? only a few files were tested
 
 Example of using
