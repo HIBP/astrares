@@ -3,16 +3,19 @@
 ASTRA res-file reader
 
 Reads data from ASTRA res-file, result of modelling of code ASTRA* 
+
   *Automated System for TRansport Analysis (c) G.V.Pereverzev, P.N.Yushmanov
 
 Allows to extract from the res-file the text of model and 
 the data of the temporal signals and radial profiles. 
 
 Res-file has the following general structure:
+```
     Signature
     Text (Model + Log)
     Header 
     Frames[]
+```
 
 From the point of view of low level structure file is a sequence of packets. 
 Each packet starts from its datalength (4-byte integer, little endian), further contains some data of specified length (in bytes)
@@ -53,6 +56,7 @@ Versions of Astra:
     7.0   - OK ??? only a few files were tested
 
 Example of using
+```python
     res = ResFile("GG2")
 
     # time signal                                                                 
@@ -62,3 +66,4 @@ Example of using
     # profile one-by-one
     rr, t, yy = res.find_profile('Te', time=0.00198729)
     plt.plot(rr, yy)
+```
