@@ -442,6 +442,7 @@ class ResFile:
         n = self.get_profile_count()
         n_ = len(self.header.rad_out_info.names)                
         if n_ > n: 
+            print('WARNING! Actual profile number is less the expected number')
             self.header.rad_out_info.names = self.header.rad_out_info.names[0:n]  # remove "#last" if needed
             self.header.rad_out_info.scales = self.header.rad_out_info.scales[0:n]
         elif n_ < n: 
