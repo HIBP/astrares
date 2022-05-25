@@ -3,20 +3,35 @@
 Created on Tue Apr  7 22:18:01 2020
 
 @author: reonid
-
-Simple Viewer based only on matplotlib
-
 """
 
+#from __future__ import (absolute_import, division, print_function,
+#                        unicode_literals)
+
+#import six
+#from six.moves import zip
+
 import numpy as np
-import matplotlib.pyplot as plt
+
+#from matplotlib.mlab import dist
+#from matplotlib.patches import Circle, Rectangle
+#from matplotlib.lines import Line2D
+#from matplotlib.transforms import blended_transform_factory
 from matplotlib.widgets import AxesWidget, Button #, TextBox, RadioButtons
+#from matplotlib.offsetbox import TextArea
+#from matplotlib.text import Text                 
+# .textpath
+
+import matplotlib.pyplot as plt
+
+#from tkinter import filedialog, Listbox, END
 
 
-UP_TEXT = '<<...' 
-DOWN_TEXT = '...>>' 
-MAX_LABELS = 100
-
+#UP_TEXT = '//\\\\' # '<UP>'
+#DOWN_TEXT = '\\\\//' #'<DOWN>'
+UP_TEXT = '<<...' # '<UP>'
+DOWN_TEXT = '...>>' #'<DOWN>'
+MAX_LABELS = 80
 
 def in_rect(pt, rct):
     return rct.get_window_extent().contains(pt[0], pt[1])
@@ -232,18 +247,11 @@ class ListBox(AxesWidget):
         for lbl, txt, i in zip(self.labels[ii0:ii1], 
                                self.items[i0:i1], 
                                range(i0, i1)): 
-
-            #if i == self.item_active: # ??? in some cases there can be a bug
-            if listbox_active_item_name(self) == txt: 
-                bgcolor = 'blue'
-                txtcolor = 'white'
-            else: 
-                bgcolor = 'white'
-                txtcolor = 'black'
-                
             lbl.set_text(txt)
             lbl.set_visible(True)
 
+            bgcolor = 'blue' if i == self.item_active else 'white'
+            txtcolor = 'white' if i == self.item_active else 'black'
             lbl.set_color(txtcolor)
             lbl.set_backgroundcolor(bgcolor)
 
@@ -347,18 +355,6 @@ def listbox_get_active_text(obj):
     else: 
         obj.get_text()
 
-def listbox_active_item_name(listbox): 
-    if listbox is None: 
-        return None
-    else: 
-        idx = listbox.item_active
-        try: 
-            name = listbox.items[idx]
-        except IndexError: 
-            name = None
-    
-        return name   
-
 class Scroll(AxesWidget):
     def __init__(self, ax):
         AxesWidget.__init__(self, ax)
@@ -433,10 +429,15 @@ class Viewer:
     def _changed2(self, text): 
         self._changed()
 
-
     def get_active_names(self): 
-        name1 = listbox_active_item_name(self.listbox1)
-        name2 = listbox_active_item_name(self.listbox2)
+        i1 = self.listbox1.item_active
+        name1 = self.listbox1.items[i1]
+        if self.listbox2 is not None: 
+            i2 = self.listbox2.item_active
+            name2 = self.listbox2.items[i2]
+        else: 
+            name2 = None
+        
         return name1, name2
         
     def _changed(self): 
@@ -468,19 +469,19 @@ class Viewer:
         b.on_clicked(action)
         self.buttons[name] = b
 
+#------------------------------------------------------------------------------
+
 class TestViewerAdapter(ViewerAdapter): 
     def get_titles(self): 
         return 'Test', 'X' #None
     
     def get_signal(self, name1, name2): 
-        if (name1 is None)or(name2 is None): 
-            return None, None
-
         freq = float(name1)
         t = np.arange(0.0, 1.0, 0.001)
         data = np.sin(2*np.pi*freq*t)
+        #k = 1 if name2 == 'first' else 0.5        
+        k = {'first': 1.0, 'second': 0.5, 'third': 0.3}[name2]
         
-        k = {'first': 1, 'second': 2, 'third': 3}[name2]
         return t, k*data
         
     def get_names1(self): 
@@ -493,9 +494,36 @@ class TestViewerAdapter(ViewerAdapter):
         else:
             return ['first', 'second']
 
+    def init_gui(self, viewer): 
+        
+        def rescale(rel_margin): 
+            xy = viewer.line.get_xydata() 
+            xs = xy[:,0]
+            ys = xy[:,1]
+            xmin, xmax = np.min(xs), np.max(xs)
+            ymin, ymax = np.min(ys), np.max(ys)
+            dx = (xmax - xmin)*rel_margin
+            dy = (ymax - ymin)*rel_margin
+            
+            viewer.line.axes.set_xlim(xmin - dx, xmax + dx)
+            viewer.line.axes.set_ylim(ymin - dy, ymax + dy)
+            plt.draw()
+
+        def testbtn1_click(event):
+            rescale(0.0)
+            viewer._changed()
+
+        def testbtn2_click(event):
+            rescale(0.1)
+            viewer._changed()
+                                # x    y    width height
+        viewer.add_btn('Test1', [0.3,  0.05, 0.1, 0.075], testbtn1_click)
+        viewer.add_btn('Test2', [0.85, 0.05, 0.1, 0.075], testbtn2_click)
+
 
 if __name__ == '__main__': 
 
+    # https://matplotlib.org/stable/api/widgets_api.html
     
     vwr = Viewer(TestViewerAdapter(None))
     plt.show()

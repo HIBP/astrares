@@ -17,7 +17,7 @@ Res-file has the following general structure:
     Frames[]
 ```
 
-From the point of view of low level structure file is a sequence of packets. 
+From the point of view of low level structure the res-file is a sequence of packets. 
 Each packet starts from its datalength (4-byte integer, little endian), further contains some data of specified length (in bytes)
 and ends with the repetition of its datalength (the same 4-byte integer as in the beginning). 
 

@@ -43,5 +43,5 @@ def test_t15conOH3():
 test_33957a()
 test_t15conOH3()
 
-test_GG2()
+test_GG2()  # WARNING is OK
 test_test()

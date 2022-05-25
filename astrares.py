@@ -393,7 +393,7 @@ class ResFile:
             while True: 
                 try:
                     s = read_packet(file, 'str')
-                    if s == ASTRA_RES_SIGNATURE: # diveider between model section and log section
+                    if s == ASTRA_RES_SIGNATURE: # separator between model section and log section
                         section += 1
                     elif section == 0: 
                         self.model.append(s)
@@ -420,7 +420,7 @@ class ResFile:
                     break   #OK                    
                 except BaseException as e: 
                     print(type(e).__name__, ": '", e, "'")
-                    print('WARNING! Not all the frames has been readed!')
+                    print('WARNING! Not all the frames have been readed!')
                     break
             
             self._last_file_pos = file.tell()
